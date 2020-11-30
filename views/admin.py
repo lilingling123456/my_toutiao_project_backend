@@ -2,7 +2,7 @@ import jwt
 
 from flask import jsonify, request
 from functools import wraps
-from models import User
+from models import User,Channel
 from werkzeug.security import generate_password_hash, check_password_hash
 
 def login_required(f):
@@ -60,6 +60,7 @@ def login():
         return jsonify({"error": "Invalid password"}), 401
 
     token = jwt.encode({
+        "userid":str(user.id),
         "name": user.name,
         "email": user.email,
         "code": user.code,
@@ -85,6 +86,25 @@ def get_user_profile(userid):
         "message": 'OK',
         "data": user.to_public_json()
     })
-
+@app.route('/mp/v1_0/channels',methods=['GET'])
+@login_required
+def get_channels(userid):
+    # channel1 = Channel(
+    #     name='python'
+    # )
+    # channel1.save()
+    # channel2 = Channel(
+    #     name='java'
+    # )
+    # channel2.save()
+    # channel3 = Channel(
+    #     name='mysql'
+    # )
+    # channel3.save()
+    channels = Channel.objects
+    return  jsonify({
+        "message": 'OK',
+        "data": channels.to_publish_json()
+    })
 
 
