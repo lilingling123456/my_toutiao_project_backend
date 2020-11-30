@@ -104,7 +104,9 @@ def get_channels(userid):
     channels = Channel.objects
     return  jsonify({
         "message": 'OK',
-        "data": channels.to_publish_json()
+        "data": {
+            "channels": channels.to_public_json()
+        }
     })
 
 
