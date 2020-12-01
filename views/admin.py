@@ -155,7 +155,7 @@ def get_images(userid):
         imgs = Img.objects(Q(user=user) & Q(is_collected=True))# 多条件查询
     elif collect == 'false':
         imgs = Img.objects(user=user)
-        
+
     page = int(request.args.get("page"))
     per_page = int(request.args.get("per_page"))
 
@@ -170,16 +170,28 @@ def get_images(userid):
             "results": paginated_imgs.to_public_json()
         }
     })
-@app.route("/mp/v1_0/user/images/<string:imageId>",methods=['PUT'])
+@app.route("/mp/v1_0/user/images/<string:imageId>",methods=['PUT','DELETE'])
 @login_required
 def collectImage(userid, imageId):
-    img= Img.objects(id=imageId).first()
-    img.is_collected = request.json.get('collect')
-    img.save()
-    return jsonify({
-        "message": 'OK',
-        "data": {
-            "id": str(img.id),
-            "collect": img.is_collected
-        }
-    })
+    if request.method == 'PUT':
+        img= Img.objects(id=imageId).first()
+        img.is_collected = request.json.get('collect')
+        img.save()
+        return jsonify({
+            "message": 'OK',
+            "data": {
+                "id": str(img.id),
+                "collect": img.is_collected
+            }
+        })
+    elif request.method == 'DELETE':
+        img = Img.objects(id=imageId).first()
+        img.delete()
+
+        return jsonify({
+            "message": 'OK',
+            "data": {
+                "id": str(img.id),
+                "collect": img.is_collected
+            }
+        })
