@@ -149,9 +149,11 @@ def images_rsp(filename):
 def get_images(userid):
     user = User.objects(id=userid).first()
     imgs = Img.objects(user=user)
-    page = int(request.args.get('page'))
-    per_page = int(request.args.get('per_page'))
-    paginated_imgs = imgs.skip((page-1)*per_page).limit(per_page)
+    page = int(request.args.get("page"))
+    per_page = int(request.args.get("per_page"))
+
+    paginated_imgs = imgs.skip((page - 1) * per_page).limit(per_page)
+
     return jsonify({
         "message": 'OK',
         "data": {
@@ -161,4 +163,16 @@ def get_images(userid):
             "results": paginated_imgs.to_public_json()
         }
     })
-
+@app.route("/mp/v1_0/user/images/<string:imageId>",methods=['PUT'])
+@login_required
+def collectImage(userid, imageId):
+    img= Img.objects(id=imageId).first()
+    img.is_collected = request.json.get('collect')
+    img.save()
+    return jsonify({
+        "message": 'OK',
+        "data": {
+            "id": str(img.id),
+            "collect": img.is_collected
+        }
+    })
